@@ -6,7 +6,7 @@ written by fb.com/sumit.luv
 from django.contrib import admin
 from django.urls import path
 from school import views
-from django.contrib.auth.views import LoginView,LogoutView
+from django.contrib.auth.views import LoginView, LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -18,14 +18,14 @@ urlpatterns = [
 
 
     path('adminsignup', views.admin_signup_view),
-    path('studentsignup', views.student_signup_view,name='studentsignup'),
+    path('studentsignup', views.student_signup_view, name='studentsignup'),
     path('teachersignup', views.teacher_signup_view),
     path('adminlogin', LoginView.as_view(template_name='school/adminlogin.html')),
     path('studentlogin', LoginView.as_view(template_name='school/studentlogin.html')),
     path('teacherlogin', LoginView.as_view(template_name='school/teacherlogin.html')),
 
 
-    path('afterlogin', views.afterlogin_view,name='afterlogin'),
+    path('afterlogin', views.afterlogin_view, name='afterlogin'),
     path('logout', LogoutView.as_view(template_name='school/index.html'),name='logout'),
 
 
@@ -79,5 +79,5 @@ urlpatterns = [
 
 
     path('aboutus', views.aboutus_view),
-    path('contactus', views.contactus_view),
+    # path('contactus', views.contactus_view),
 ]
