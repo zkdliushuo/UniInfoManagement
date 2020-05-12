@@ -2,9 +2,9 @@
 # 在下面忽略不需要上传的文件
 
 # for django
-venv/*
-build/*
-dist/*
+venv/
+build/
+dist/
 *.pyc
 *.pyo
 .idea/
