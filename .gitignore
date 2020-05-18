@@ -8,3 +8,4 @@ dist/
 *.pyc
 *.pyo
 .idea/
+db.sqlite3
