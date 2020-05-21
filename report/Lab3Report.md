@@ -1,6 +1,6 @@
 # Lab 3 -- Database Application Development
 
-![download](/home/flint/Pictures/download.jpeg)
+![1](./1.jpeg)
 
 ## 实验概述
 
@@ -60,7 +60,7 @@ $ python manage.py runserver
 
 1. 运行界面
 
-   ![](/home/flint/Documents/UniInfoManagement/report/major_management.png)
+   ![](./major_management.png)
 
 2. 实现
 
