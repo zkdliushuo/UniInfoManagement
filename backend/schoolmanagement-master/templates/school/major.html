@@ -1,0 +1,81 @@
+{% extends 'school/base.html' %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+
+<head>
+
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="https://use.fontawesome.com/4498ac6aa5.js"></script>
+
+  <style media="screen">
+    .row {
+      margin: 10px;
+    }
+
+    .table {
+      text-align: center;
+    }
+    .badge {
+      width: 35px;
+      height: 20px;
+      font-size: 14px;
+    }
+
+  </style>
+
+</head>
+
+
+
+<div class="container">
+  <div class="row">
+    <form method="post" novalidate>
+      <div class="form-row">
+        {% for field in form %}
+          <div class="form-group col-md-2">
+            {% render_field field class="form-control" class="is-valid" placeholder=field.label %}
+          </div>
+        {% endfor %}
+      </div>
+      <div>
+        <button type="submit" class="btn btn-primary">查询</button>
+        <a class="btn btn-success" href="/add-major" role="button">添加记录</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="row">
+    <table class="table table-hover table-striped table-bordered" id="dev-table">
+      <thead class="thead-dark">
+        <tr>
+          <th>专业代码</th>
+          <th>专业名称</th>
+          <th>专业地址</th>
+          <th>专业地址</th>
+          <th>负责人</th>
+          <th>编辑</th>
+          <th>删除</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for major in majors %}
+          <tr>
+            <td> {{ major.id }}</td>
+            <td>{{ major.name }}</td>
+            <td>{{ major.address }}</td>
+            <td>{{ major.charger }}</td>
+            <td>{{ major.campus }}</td>
+            <td><a href="{% url 'update-major' major.id %}" class="badge badge-primary"><i class="fa fa-pencil"></i></a></td>
+            <td><a href="{% url 'delete-major' major.id %}" class="badge badge-danger"><i class="fa fa-trash"></i></a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+  </div>
+</div>
+
+{% endblock content %}

@@ -70,3 +70,52 @@ admin
 
 ![1589818419972](assets/1589818419972.png)
 
+
+
+---
+
+## “专业管理”前端
+
+打开http://127.0.0.1:8000/，重定向到major页。
+
+左边栏用来切换页面（现在只有“专业管理”是有用的）。
+
+![image-20200521152248762](assets/image-20200521152248762.png)
+
+查询和删除按钮还没有实际作用。
+
+查询：
+
+```html
+<button type="submit" class="btn btn-primary">查询</button>
+```
+
+删除：
+
+```html
+<a href="{% url 'delete-major' major.id %}" class="badge badge-danger"><i class="fa fa-trash"></i></a>
+```
+
+转到/delete-major/major.id
+
+
+
+点击添加记录：
+
+![image-20200521152326635](assets/image-20200521152326635.png)
+
+点击编辑：
+
+![image-20200521152349876](assets/image-20200521152349876.png)
+
+点击提交后，如果有错误，会显示：
+
+![image-20200521153447106](assets/image-20200521153447106.png)
+
+现在的编辑页面对模型所有项都可以修改，专业代码不可修改等约束建议在后端实现。
+
+## 其他改动
+
+* settings.py：注释掉了csrf检验（这个实验就不考虑安全问题了，也没有用户登录机制）
+* urls.py：加入相关的页面地址
+* views.py：写了简易的views用来测试前端的错误显示效果
