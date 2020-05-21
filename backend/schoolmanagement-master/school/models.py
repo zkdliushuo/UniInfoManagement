@@ -80,7 +80,7 @@ class Major(models.Model):
     name = models.CharField('专业名称', max_length=100, null=False, unique=True)
     address = models.CharField('专业地址', max_length=100, null=False)
     charger = models.CharField('负责人', max_length=50, null=False)
-    campus = models.ForeignKey(Campus, on_delete=models.PROTECT)
+    campus = models.ForeignKey(Campus, on_delete=models.PROTECT, verbose_name='校区')
 
     def __str__(self):
         return self.name
@@ -96,7 +96,7 @@ class Classes(models.Model):
     start_date = models.DateField('创建时间', auto_now_add=True)
     head_teacher = models.CharField('班主任', max_length=50)
     grade = models.CharField('年级', max_length=4)
-    major = models.ForeignKey(Major, on_delete=models.PROTECT)
+    major = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
 
     def __str__(self):
         return self.name
@@ -142,7 +142,7 @@ class Teacher(People):
     teacher_num = models.CharField('教职工编号', max_length=10, unique=True)
     join_date = models.DateField('入职年月')
     email = models.EmailField('邮箱')
-    major = models.ForeignKey(Major, on_delete=models.PROTECT)
+    major = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
     ASSOCIATE_PROF = 'AP'
     PROF = 'P'
     RANK_TYPE_CHOICES = (
@@ -163,7 +163,7 @@ class Student(People):
     student_id = models.CharField('学号', max_length=10, unique=True)
     start_date = models.DateField('入学年月')
     email = models.EmailField('邮箱')
-    classes = models.ForeignKey(Classes, on_delete=models.PROTECT)
+    classes = models.ForeignKey(Classes, on_delete=models.PROTECT, verbose_name='班级')
 
     def __str__(self):
         return self.chinese_name
@@ -179,8 +179,8 @@ class StudyEvent(models.Model):
 
     event_num = models.CharField('异动编号', max_length=10, primary_key=True)
     date = models.DateField('异动日期')
-    old_class = models.ForeignKey(Classes, on_delete=models.PROTECT)
-    new_class = models.ForeignKey(Classes, on_delete=models.PROTECT)
+    old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, verbose_name='原班级')
+    new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, verbose_name='新班级')
 
     class Meta:
         abstract = True
@@ -199,7 +199,7 @@ class ChangeMajor(StudyEvent):
     change_association = models.CharField('是否转出团员关系', max_length=9, choices=CHANGE_TYPE)
     old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Change_from')
     new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Change_to')
-    student = models.OneToOneField(Student, on_delete=models.PROTECT)
+    student = models.OneToOneField(Student, on_delete=models.PROTECT, verbose_name='异动学生')
 
     def __str__(self):
         return self.event_num + " 转专业"
@@ -219,7 +219,7 @@ class StudyDelay(StudyEvent):
     delay_reason = models.CharField('降级原因', max_length=5, choices=DELAY_REASON)
     old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Delay_from')
     new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Delay_to')
-    student = models.OneToOneField(Student, on_delete=models.PROTECT)
+    student = models.OneToOneField(Student, on_delete=models.PROTECT, verbose_name='异动学生')
 
     def __str__(self):
         return self.event_num + " 降级"
@@ -232,7 +232,7 @@ class StudyDelay(StudyEvent):
 class Course(models.Model):
     id = models.CharField('课程号', primary_key=True, max_length=18, unique=True)
     name = models.CharField('课程名称', unique=True, max_length=100)
-    school = models.ForeignKey(Major, on_delete=models.PROTECT)
+    school = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
     EXAMS = 'E'
     PRESENTATION = 'P'
     TEST_TYPE = (
@@ -255,8 +255,8 @@ class Course(models.Model):
 
 
 class StartedCourseInfo(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.PROTECT)
-    course = models.ForeignKey(Course, on_delete=models.PROTECT)
+    teacher = models.ForeignKey(Teacher, on_delete=models.PROTECT, verbose_name='开课教师')
+    course = models.ForeignKey(Course, on_delete=models.PROTECT, verbose_name='开课课程')
     year_start = models.DateField('开课年份')
     SPRING = '春季'
     AUTUMN = '秋季'
@@ -297,8 +297,8 @@ class StartedCourseInfo(models.Model):
 
 
 class ChooseCourse(models.Model):
-    course = models.ForeignKey(StartedCourseInfo, on_delete=models.PROTECT)
-    student = models.ForeignKey(Student, on_delete=models.PROTECT)
+    course = models.ForeignKey(StartedCourseInfo, on_delete=models.PROTECT, verbose_name='选课课程')
+    student = models.ForeignKey(Student, on_delete=models.PROTECT, verbose_name='选课学生')
     grade = models.PositiveSmallIntegerField('考试成绩', null=True)
 
     def __str__(self):

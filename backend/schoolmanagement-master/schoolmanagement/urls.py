@@ -33,7 +33,7 @@ urlpatterns = [
 
 
     path('admin-teacher', views.admin_teacher_view,name='admin-teacher'),
-    path('admin-add-teacher', views.admin_add_teacher_view,name='admin-add-teacher'),
+    path('admin-add-teacher', views.admin_add_teacher_view, name='admin-add-teacher'),
     path('admin-view-teacher', views.admin_view_teacher_view,name='admin-view-teacher'),
     path('admin-approve-teacher', views.admin_approve_teacher_view,name='admin-approve-teacher'),
     path('approve-teacher/<int:pk>', views.approve_teacher_view,name='approve-teacher'),
@@ -44,7 +44,7 @@ urlpatterns = [
 
 
     path('admin-student', views.admin_student_view,name='admin-student'),
-    path('admin-add-student', views.admin_add_student_view,name='admin-add-student'),
+    path('admin-add-student', views.admin_add_student_view, name='admin-add-student'),
     path('admin-view-student', views.admin_view_student_view,name='admin-view-student'),
     path('delete-student-from-school/<int:pk>', views.delete_student_from_school_view,name='delete-student-from-school'),
     path('delete-student/<int:pk>', views.delete_student_view,name='delete-student'),
