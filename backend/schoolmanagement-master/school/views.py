@@ -586,3 +586,11 @@ def aboutus_view(request):
 #                       fail_silently=False)
 #             return render(request, 'school/contactussuccess.html')
 #     return render(request, 'school/contactus.html', {'form': sub})
+
+
+def add_major(request):
+    form = forms.MajorForm()
+    if request.method == 'POST':
+        form = forms.MajorForm(request.POST)
+        if form.is_valid():
+
