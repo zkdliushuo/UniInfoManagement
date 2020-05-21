@@ -12,6 +12,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home_view, name=''),
 
+    path('major', views.major_view, name='major'),
+    path('update-major/<int:pk>', views.update_major_view,name='update-major'),
+    path('add-major', views.add_major_view, name='add-major'),
+    path('delete-major/<int:pk>', views.delete_major_view, name='delete-major'),
+
+    # ========================== the following is not used =========================== #
+
     path('adminclick', views.adminclick_view),
     path('teacherclick', views.teacherclick_view),
     path('studentclick', views.studentclick_view),

@@ -7,9 +7,40 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 def home_view(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('afterlogin')
-    return render(request, 'school/index.html')
+    return HttpResponseRedirect('major')
+
+
+def major_view(request):
+    form = forms.MajorForm()
+    majors = models.Major.objects.all()
+    return render(request, 'school/major.html', context={'form': form, 'majors': majors})
+
+
+def update_major_view(request, pk):
+    major = models.Major.objects.get(id=pk)
+    if request.method == 'POST':
+        form = forms.MajorForm(request.POST, instance=major)
+        if form.is_valid():
+            HttpResponseRedirect('major')
+    else:
+        form = forms.MajorForm(instance=major)
+    return render(request, 'school/update_major.html', context={'form': form})
+
+
+def add_major_view(request):
+    if request.method == 'POST':
+        form = forms.MajorForm(request.POST)
+        if form.is_valid():
+            HttpResponseRedirect('major')
+    else:
+        form = forms.MajorForm()
+    return render(request, 'school/add_major.html', context={'form': form})
+
+
+def delete_major_view(request, pk):
+    return redirect('major')
+
+# ========================== the following is not used =========================== #
 
 
 # for showing signup/login button for teacher(by sumit)
