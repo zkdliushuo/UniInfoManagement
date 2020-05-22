@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_delete, post_save, pre_delete
+from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
 
@@ -177,8 +177,8 @@ class Course(models.Model):
     id = models.CharField('课程号', primary_key=True, max_length=18, unique=True)
     name = models.CharField('课程名称', unique=True, max_length=100)
     school = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
-    EXAMS = 'E'
-    PRESENTATION = 'P'
+    EXAMS = '考试'
+    PRESENTATION = '当堂答辩'
     TEST_TYPE = (
         (EXAMS, '考试'),
         (PRESENTATION, '当堂答辩'),
@@ -266,7 +266,6 @@ class ChooseCourse(models.Model):
 @receiver(pre_delete, sender=ChangeMajor)
 @receiver(pre_delete, sender=StudyDelay)
 def post_delete_study_event(sender, instance, **kwargs):
-    print("=================")
     if instance.student.classes.id == instance.new_class.id:
         instance.student.classes = instance.old_class
         instance.student.save()
@@ -277,10 +276,9 @@ def post_delete_study_event(sender, instance, **kwargs):
         )
 
 
-@receiver(post_save, sender=ChangeMajor)
-@receiver(post_save, sender=StudyDelay)
+@receiver(pre_save, sender=ChangeMajor)
+@receiver(pre_save, sender=StudyDelay)
 def post_save_study_event(sender, instance, **kwargs):
-    print("=================")
     if instance.student.classes.id == instance.old_class.id:
         instance.student.classes = instance.new_class
         instance.student.save()
@@ -289,3 +287,4 @@ def post_save_study_event(sender, instance, **kwargs):
             message='转出班级与学生班级不匹配',
             code='unique_together',
         )
+
