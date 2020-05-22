@@ -4,12 +4,9 @@ from django.db.models import Sum
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required, user_passes_test
-<<<<<<< HEAD
 from django.core.exceptions import ObjectDoesNotExist
-=======
 from django.db.models import ProtectedError
 from django.contrib import messages
->>>>>>> b1ce23db9289bb50e96e79adf0eaf8311c9b551b
 
 
 def home_view(request):
