@@ -80,7 +80,7 @@ class Major(models.Model):
     name = models.CharField('专业名称', max_length=100, null=False, unique=True)
     address = models.CharField('专业地址', max_length=100, null=False)
     charger = models.CharField('负责人', max_length=50, null=False)
-    campus = models.ForeignKey(Campus, on_delete=models.PROTECT, verbose_name='校区')
+    campus = models.ForeignKey(Campus, verbose_name='校区', on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name

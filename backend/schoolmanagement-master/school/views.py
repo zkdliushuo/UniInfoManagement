@@ -4,7 +4,12 @@ from django.db.models import Sum
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required, user_passes_test
+<<<<<<< HEAD
 from django.core.exceptions import ObjectDoesNotExist
+=======
+from django.db.models import ProtectedError
+from django.contrib import messages
+>>>>>>> b1ce23db9289bb50e96e79adf0eaf8311c9b551b
 
 
 def home_view(request):
@@ -63,14 +68,11 @@ def delete_major_view(request, pk):
         major = models.Major.objects.get(id=pk)
     except ObjectDoesNotExist:
         print("您想删除的条目不存在.")
-    if request.method == 'POST':
-        form = forms.MajorForm(request.POST, instance=major)
-        if form.is_valid():
-            major.delete()
-            return redirect('major')
-    else:
-        form = forms.MajorForm(instance=major)
-    return render(request, 'school/update_major.html', context={'form': form})
+    try:
+        major.delete()
+    except ProtectedError:
+        messages.error(request, '错误：存在关联信息，不可删除')
+    return redirect('major')
 
 
 def campus_view(request):
