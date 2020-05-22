@@ -31,6 +31,7 @@ def update_major_view(request, pk):
     if request.method == 'POST':
         form = forms.MajorForm(request.POST, instance=major)
         if 'id' in form.changed_data:
+            form.errors.clear()
             form.errors['id'] = '错误，专业代码不可修改'
             return render(request, 'school/update_major.html', context={'form': form})
         if form.is_valid():
@@ -87,6 +88,7 @@ def update_campus_view(request, pk):
     if request.method == 'POST':
         form = forms.CampusForm(request.POST, instance=campus)
         if 'id' in form.changed_data:
+            form.errors.clear()
             form.errors['id'] = '错误，校区代码不可修改'
             return render(request, 'school/update_campus.html', context={'form': form})
         if form.is_valid():
@@ -145,6 +147,7 @@ def update_classes_view(request, pk):
     if request.method == 'POST':
         form = forms.ClassesForm(request.POST, instance=classes)
         if 'id' in form.changed_data:
+            form.errors.clear()
             form.errors['id'] = '错误，班级代码不可修改'
             return render(request, 'school/update_classes.html', context={'form': form})
         if form.is_valid():
@@ -203,6 +206,7 @@ def update_teacher_view(request, pk):
     if request.method == 'POST':
         form = forms.TeacherForm(request.POST, instance=teacher)
         if 'teacher_num' in form.changed_data:
+            form.errors.clear()
             form.errors['teacher_num'] = '错误，教师工号不可修改'
             return render(request, 'school/update_teacher.html', context={'form': form})
         if form.is_valid():
@@ -260,6 +264,7 @@ def update_student_view(request, pk):
     if request.method == 'POST':
         form = forms.StudentForm(request.POST, instance=student)
         if 'student_id' in form.changed_data:
+            form.errors.clear()
             form.errors['student_id'] = '错误，学号不可修改'
             return render(request, 'school/update_student.html', context={'form': form})
         if form.is_valid():
@@ -462,7 +467,6 @@ def delete_course_view(request, pk):
     return redirect('course')
 
 
-
 def started_course_view(request):
     form = forms.StartedCourseInfoForm()
     courses = models.StartedCourseInfo.objects.all()
@@ -533,12 +537,12 @@ def update_select_course_view(request, pk):
     except ObjectDoesNotExist:
         print("您想编辑的条目不存在.")
     if request.method == 'POST':
-        form = forms.StudentForm(request.POST, instance=select_course)
+        form = forms.ChooseCourseForm(request.POST, instance=select_course)
         if form.is_valid():
             form.save()
             return redirect('select-course')
     else:
-        form = forms.StudentForm(instance=select_course)
+        form = forms.ChooseCourseForm(instance=select_course)
     return render(request, 'school/update_select_course.html', context={'form': form})
 
 

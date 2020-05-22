@@ -54,13 +54,13 @@ urlpatterns = [
     path('delete-course/<pk>', views.delete_course_view, name='delete-course'),
 
     path('started-course', views.started_course_view, name='started-course'),
-    path('update-started-course/<pk>', views.update_started_course_view, name='update-started-course'),
+    path('update-started-course/<int:pk>', views.update_started_course_view, name='update-started-course'),
     path('add-started-course', views.add_started_course_view, name='add-started-course'),
-    path('delete-started-course/<pk>', views.delete_started_course_view, name='delete-started-course'),
+    path('delete-started-course/<int:pk>', views.delete_started_course_view, name='delete-started-course'),
 
     path('select-course', views.select_course_view, name='select-course'),
-    path('update-select-course/<pk>', views.update_select_course_view, name='update-select-course'),
+    path('update-select-course/<int:pk>', views.update_select_course_view, name='update-select-course'),
     path('add-select-course', views.add_select_course_view, name='add-select-course'),
-    path('delete-select-course/<pk>', views.delete_select_course_view, name='delete-select-course'),
+    path('delete-select-course/<int:pk>', views.delete_select_course_view, name='delete-select-course'),
 
 ]
