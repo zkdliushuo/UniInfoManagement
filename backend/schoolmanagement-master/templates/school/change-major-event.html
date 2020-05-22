@@ -14,9 +14,16 @@
       margin: 10px;
     }
 
+    .error {
+      color: red;
+      text-align: right;
+      float: right;
+    }
+
     .table {
       text-align: center;
     }
+
     .badge {
       width: 35px;
       height: 20px;
@@ -41,7 +48,7 @@
       </div>
       <div>
         <button type="submit" class="btn btn-primary">查询</button>
-        <a class="btn btn-success" href="/add-classes" role="button">添加记录</a>
+        <a class="btn btn-success" href="/add-change-major-event" role="button">添加记录</a>
         {% if messages %}
           {% for message in messages %}
             <span {% if message.tags %} class="{{ message.tags }}"{% endif %}>
@@ -57,27 +64,27 @@
     <table class="table table-hover table-striped table-bordered" id="dev-table">
       <thead class="thead-dark">
         <tr>
-          <th>班级代码</th>
-          <th>班级名称</th>
-          <th>创建时间</th>
-          <th>班主任</th>
-          <th>年级</th>
-          <th>专业</th>
+          <th>异动编号</th>
+          <th>异动日期</th>
+          <th>原班级</th>
+          <th>新班级</th>
+          <th>异动学生</th>
+          <th>转出团员</th>
           <th>编辑</th>
           <th>删除</th>
         </tr>
       </thead>
       <tbody>
-        {% for aclass in classes %}
+        {% for study in studies %}
           <tr>
-            <td> {{ aclass.id }}</td>
-            <td>{{ aclass.name }}</td>
-            <td>{{ aclass.start_date }}</td>
-            <td>{{ aclass.head_teacher }}</td>
-            <td>{{ aclass.grade }}</td>
-            <td>{{ aclass.major }}</td>
-            <td><a href="{% url 'update-classes' aclass.id %}" class="badge badge-primary"><i class="fa fa-pencil"></i></a></td>
-            <td><a href="{% url 'delete-classes' aclass.id %}" class="badge badge-danger"><i class="fa fa-trash"></i></a></td>
+            <td> {{ study.event_num }}</td>
+            <td>{{ study.date }}</td>
+            <td>{{ study.old_class }}</td>
+            <td>{{ study.new_class }}</td>
+            <td>{{ study.student }}</td>
+            <td>{{ study.change_association }}</td>
+            <td><a href="{% url 'update-change-major-event' study.event_num %}" class="badge badge-primary"><i class="fa fa-pencil"></i></a></td>
+            <td><a href="{% url 'delete-change-major-event' study.event_num %}" class="badge badge-danger"><i class="fa fa-trash"></i></a></td>
           </tr>
         {% endfor %}
       </tbody>

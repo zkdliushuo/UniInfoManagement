@@ -5,62 +5,6 @@ from django.core.exceptions import ValidationError
 from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
 
-# Create your models here.
-#
-#
-# class TeacherExtra(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     salary = models.PositiveIntegerField(null=False)
-#     joindate = models.DateField(auto_now_add=True)
-#     mobile = models.CharField(max_length=40)
-#     status = models.BooleanField(default=False)
-#
-#     def __str__(self):
-#         return self.user.first_name
-#
-#     @property
-#     def get_id(self):
-#         return self.user.id
-#
-#     @property
-#     def get_name(self):
-#         return self.user.first_name + " " + self.user.last_name
-#
-#
-# class StudentExtra(models.Model):
-#     classes = [('one', 'one'), ('two', 'two'), ('three', 'three'), ('four', 'four'), ('five', 'five'), ('six', 'six'),
-#                ('seven', 'seven'), ('eight', 'eight'), ('nine', 'nine'), ('ten', 'ten')]
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     roll = models.CharField(max_length=10)
-#     mobile = models.CharField(max_length=40, null=True)
-#     fee = models.PositiveIntegerField(null=True)
-#     cl = models.CharField(max_length=10, choices=classes, default='one')
-#     status = models.BooleanField(default=False)
-#
-#     @property
-#     def get_name(self):
-#         return self.user.first_name + " " + self.user.last_name
-#
-#     @property
-#     def get_id(self):
-#         return self.user.id
-#
-#     def __str__(self):
-#         return self.user.first_name
-#
-#
-# class Attendance(models.Model):
-#     roll = models.CharField(max_length=10, null=True)
-#     date = models.DateField()
-#     cl = models.CharField(max_length=10)
-#     present_status = models.CharField(max_length=10)
-#
-#
-# class Notice(models.Model):
-#     date = models.DateField(auto_now=True)
-#     by = models.CharField(max_length=20, null=True, default='school')
-#     message = models.CharField(max_length=500)
-
 
 class Campus(models.Model):
     id = models.CharField('校区代码', max_length=10, primary_key=True)
@@ -112,16 +56,16 @@ class People(models.Model):
             raise ValueError('请输入18位身份证号码,您只输入了%s位' % len(self))
 
     identification = models.CharField('身份信息号', primary_key=True, max_length=18, unique=True, validators=[idvalidator])
-    ID_CARD = 'ID'
-    PASSPORT = 'PA'
+    ID_CARD = '身份证'
+    PASSPORT = '护照'
     ID_TYPE_CHOICES = (
         (ID_CARD, '身份证'),
         (PASSPORT, '护照'),
     )
     id_type = models.CharField('身份信息类型', max_length=7, choices=ID_TYPE_CHOICES, default=ID_CARD)
     chinese_name = models.CharField('中文名', max_length=10, null=False)
-    MALE = 'M'
-    FEMALE = 'F'
+    MALE = '男'
+    FEMALE = '女'
     GENDER_TYPE_CHOICES = (
         (MALE, '男'),
         (FEMALE, '女'),
@@ -143,8 +87,8 @@ class Teacher(People):
     join_date = models.DateField('入职年月')
     email = models.EmailField('邮箱')
     major = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
-    ASSOCIATE_PROF = 'AP'
-    PROF = 'P'
+    ASSOCIATE_PROF = '副教授'
+    PROF = '教授'
     RANK_TYPE_CHOICES = (
         (ASSOCIATE_PROF, '副教授'),
         (PROF, '教授')
@@ -188,17 +132,17 @@ class StudyEvent(models.Model):
 
 
 class ChangeMajor(StudyEvent):
-    CHANGE_YES = 'Y'
-    CHANGE_NO = 'N'
-    CHANGE_NOT_MEMBER = 'NM'
+    CHANGE_YES = '是'
+    CHANGE_NO = '否'
+    CHANGE_NOT_MEMBER = '不是团员'
     CHANGE_TYPE = (
         (CHANGE_YES, '是'),
         (CHANGE_NO, '否'),
         (CHANGE_NOT_MEMBER, '不是团员'),
     )
     change_association = models.CharField('是否转出团员关系', max_length=9, choices=CHANGE_TYPE)
-    old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Change_from')
-    new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Change_to')
+    old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Change_from', verbose_name='原班级')
+    new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Change_to', verbose_name='新班级')
     student = models.OneToOneField(Student, on_delete=models.PROTECT, verbose_name='异动学生')
 
     def __str__(self):
@@ -210,15 +154,15 @@ class ChangeMajor(StudyEvent):
 
 
 class StudyDelay(StudyEvent):
-    DROP = 'D'
-    VOLUNTEER = 'V'
+    DROP = '休学'
+    VOLUNTEER = '支教'
     DELAY_REASON = (
         (DROP, '休学'),
         (VOLUNTEER, '支教'),
     )
     delay_reason = models.CharField('降级原因', max_length=5, choices=DELAY_REASON)
-    old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Delay_from')
-    new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Delay_to')
+    old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Delay_from', verbose_name='原班级')
+    new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Delay_to', verbose_name='新班级')
     student = models.OneToOneField(Student, on_delete=models.PROTECT, verbose_name='异动学生')
 
     def __str__(self):

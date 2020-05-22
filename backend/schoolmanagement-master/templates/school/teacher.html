@@ -42,6 +42,13 @@
       <div>
         <button type="submit" class="btn btn-primary">查询</button>
         <a class="btn btn-success" href="/add-teacher" role="button">添加记录</a>
+        {% if messages %}
+          {% for message in messages %}
+            <span {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+              {{ message }}
+            </span>
+          {% endfor %}
+        {% endif %}
       </div>
     </form>
   </div>
@@ -72,7 +79,7 @@
         {% for teacher in teachers %}
           <tr>
             <td> {{ teacher.identification }}</td>
-            <td>{{ teacher.ID_TYPE_CHOICES(teacher.id_type) }}</td>
+            <td>{{ teacher.id_type }}</td>
             <td>{{ teacher.chinese_name }}</td>
             <td>{{ teacher.gender_type }}</td>
             <td>{{ teacher.birth_date }}</td>

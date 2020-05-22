@@ -41,7 +41,7 @@
       </div>
       <div>
         <button type="submit" class="btn btn-primary">查询</button>
-        <a class="btn btn-success" href="/add-classes" role="button">添加记录</a>
+        <a class="btn btn-success" href="/add-teacher" role="button">添加记录</a>
         {% if messages %}
           {% for message in messages %}
             <span {% if message.tags %} class="{{ message.tags }}"{% endif %}>
@@ -57,27 +57,41 @@
     <table class="table table-hover table-striped table-bordered" id="dev-table">
       <thead class="thead-dark">
         <tr>
-          <th>班级代码</th>
-          <th>班级名称</th>
-          <th>创建时间</th>
-          <th>班主任</th>
-          <th>年级</th>
-          <th>专业</th>
+          <th>身份信息号</th>
+          <th>身份信息类型</th>
+          <th>中文名</th>
+          <th>性别</th>
+          <th>生日</th>
+          <th>国籍</th>
+          <th>家庭住址</th>
+          <th>家庭邮编</th>
+          <th>家庭电话</th>
+          <th>学号</th>
+          <th>入学年月</th>
+          <th>邮箱</th>
+          <th>所在班级</th>
           <th>编辑</th>
           <th>删除</th>
         </tr>
       </thead>
       <tbody>
-        {% for aclass in classes %}
+        {% for student in students %}
           <tr>
-            <td> {{ aclass.id }}</td>
-            <td>{{ aclass.name }}</td>
-            <td>{{ aclass.start_date }}</td>
-            <td>{{ aclass.head_teacher }}</td>
-            <td>{{ aclass.grade }}</td>
-            <td>{{ aclass.major }}</td>
-            <td><a href="{% url 'update-classes' aclass.id %}" class="badge badge-primary"><i class="fa fa-pencil"></i></a></td>
-            <td><a href="{% url 'delete-classes' aclass.id %}" class="badge badge-danger"><i class="fa fa-trash"></i></a></td>
+            <td> {{ student.identification }}</td>
+            <td>{{ student.id_type }}</td>
+            <td>{{ student.chinese_name }}</td>
+            <td>{{ student.gender_type }}</td>
+            <td>{{ student.birth_date }}</td>
+            <td> {{ student.nationality }}</td>
+            <td>{{ student.family_addr }}</td>
+            <td>{{ student.family_post_code }}</td>
+            <td>{{ student.family_phone_num }}</td>
+            <td>{{ student.student_id }}</td>
+            <td> {{ student.start_date }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.classes }}</td>
+            <td><a href="{% url 'update-student' student.identification %}" class="badge badge-primary"><i class="fa fa-pencil"></i></a></td>
+            <td><a href="{% url 'delete-student' student.identification %}" class="badge badge-danger"><i class="fa fa-trash"></i></a></td>
           </tr>
         {% endfor %}
       </tbody>

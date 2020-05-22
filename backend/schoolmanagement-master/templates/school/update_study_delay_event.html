@@ -1,0 +1,79 @@
+{% extends 'school/base.html' %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+
+<head>
+  <style media="screen">
+
+    .note {
+      text-align: center;
+      height: 60px;
+      background: -webkit-linear-gradient(left, #0072ff, #8811c5);
+      color: #fff;
+      font-weight: bold;
+      font-size: large;
+      line-height: 60px;
+    }
+
+    .form-content {
+      padding: 5%;
+      border: 1px solid #ced4da;
+      margin-bottom: 2%;
+    }
+
+    .form-control {
+      border-radius: 1.5rem;
+    }
+
+    .btnSubmit {
+      border: none;
+      border-radius: 1.5rem;
+      padding: 1%;
+      width: 20%;
+      cursor: pointer;
+      background: #0062cc;
+      color: #fff;
+    }
+  </style>
+
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
+</head>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="container-sm">
+    <div class="form">
+      <div class="note">
+        <p>编辑记录</p>
+      </div>
+
+      <div class="form-content">
+        <div class="form-row">
+          {% for field in form %}
+            <div class="form-group col-md-4">
+              <label for="field.id_for_label">{{ field.label }}</label>
+              {% if field.errors %}
+                {% render_field field class="form-control is-invalid" id="field.id_for_label" %}
+                <div class="invalid-feedback">
+                  {{ field.errors }}
+                </div>
+              {% else %}
+                {% render_field field class="form-control" id="field.id_for_label" %}
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <button type="submit" class="btn btn-primary">提交</button>
+      <a class="btn btn-primary" href="/study-delay-event" role="button">取消</a>
+    </div>
+  </div>
+
+</form>
+
+{% endblock content %}
