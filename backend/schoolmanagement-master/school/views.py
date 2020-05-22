@@ -4,6 +4,8 @@ from django.db.models import Sum
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import ProtectedError
+from django.contrib import messages
 
 
 def home_view(request):
@@ -38,6 +40,11 @@ def add_major_view(request):
 
 
 def delete_major_view(request, pk):
+    major = models.Major.objects.get(id=pk)
+    try:
+        major.delete()
+    except ProtectedError:
+        messages.error(request, '错误：存在关联信息，不可删除')
     return redirect('major')
 
 # ========================== the following is not used =========================== #

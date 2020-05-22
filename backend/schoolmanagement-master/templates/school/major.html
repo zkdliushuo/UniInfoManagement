@@ -14,9 +14,16 @@
       margin: 10px;
     }
 
+    .error {
+      color: red;
+      text-align: right;
+      float: right;
+    }
+
     .table {
       text-align: center;
     }
+
     .badge {
       width: 35px;
       height: 20px;
@@ -42,6 +49,13 @@
       <div>
         <button type="submit" class="btn btn-primary">查询</button>
         <a class="btn btn-success" href="/add-major" role="button">添加记录</a>
+        {% if messages %}
+          {% for message in messages %}
+            <span {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+              {{ message }}
+            </span>
+          {% endfor %}
+        {% endif %}
       </div>
     </form>
   </div>
