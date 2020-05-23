@@ -208,9 +208,14 @@ def update_teacher_view(request, pk):
             form.errors.clear()
             form.errors['teacher_num'] = '错误，教师工号不可修改'
             return render(request, 'school/update_teacher.html', context={'form': form})
-        if form.is_valid():
-            form.save()
-            return redirect('teacher')
+        try:
+            if form.is_valid():
+                form.save()
+                return redirect('teacher')
+        except ValueError:
+            form.errors.clear()
+            form.errors['identification'] = '错误，身份信息号不是18位'
+            return render(request, 'school/update_teacher.html', context={'form': form})
     else:
         form = forms.TeacherForm(instance=teacher)
     return render(request, 'school/update_teacher.html', context={'form': form})
@@ -220,10 +225,14 @@ def add_teacher_view(request):
     form = forms.TeacherForm()
     if request.method == 'POST':
         form = forms.TeacherForm(request.POST)
-        if form.is_valid():
-            form.save()
-            # return 才能跳出当前方法 实现重定向
-            return HttpResponseRedirect('teacher')
+        try:
+            if form.is_valid():
+                form.save()
+                return redirect('teacher')
+        except ValueError:
+            form.errors.clear()
+            form.errors['identification'] = '错误，身份信息号不是18位'
+            return render(request, 'school/add_teacher.html', context={'form': form})
     return render(request, 'school/add_teacher.html', context={'form': form})
 
 
@@ -266,10 +275,19 @@ def delete_teacher_view(request, pk):
                 messages.success(request, "成功删除该教师")
                 return redirect('teacher')
     courses = models.StartedCourseInfo.objects.filter(teacher=teacher)
-    all_course_forms = []
-    for each in courses:
-        all_course_forms.append(forms.TobeChangedStartedCourseInfoForm(instance=each))
-    return render(request, 'school/leave_started_course.html', context={'forms': all_course_forms})
+    if courses.exists():
+        all_course_forms = []
+        for each in courses:
+            all_course_forms.append(forms.TobeChangedStartedCourseInfoForm(instance=each))
+        return render(request, 'school/leave_started_course.html', context={'forms': all_course_forms})
+    else:
+        try:
+            teacher.delete()
+        except ProtectedError:
+            messages.error(request, '错误：存在其它关联信息，不可删除')
+            return redirect('teacher')
+        messages.success(request, "成功删除该教师")
+        return redirect('teacher')
 
 
 def student_view(request):
@@ -298,9 +316,14 @@ def update_student_view(request, pk):
             form.errors.clear()
             form.errors['student_id'] = '错误，学号不可修改'
             return render(request, 'school/update_student.html', context={'form': form})
-        if form.is_valid():
-            form.save()
-            return redirect('student')
+        try:
+            if form.is_valid():
+                form.save()
+                return redirect('student')
+        except ValueError:
+            form.errors.clear()
+            form.errors['identification'] = '错误，身份信息号不是18位'
+            return render(request, 'school/update_student.html', context={'form': form})
     else:
         form = forms.StudentForm(instance=student)
     return render(request, 'school/update_student.html', context={'form': form})
@@ -310,9 +333,14 @@ def add_student_view(request):
     form = forms.StudentForm()
     if request.method == 'POST':
         form = forms.StudentForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('student')
+        try:
+            if form.is_valid():
+                form.save()
+                return redirect('student')
+        except ValueError:
+            form.errors.clear()
+            form.errors['identification'] = '错误，身份信息号不是18位'
+            return render(request, 'school/add_student.html', context={'form': form})
     return render(request, 'school/add_student.html', context={'form': form})
 
 

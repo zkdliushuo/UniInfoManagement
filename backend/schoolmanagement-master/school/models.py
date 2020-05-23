@@ -40,7 +40,7 @@ class Classes(models.Model):
     start_date = models.DateField('创建时间', auto_now_add=True)
     head_teacher = models.CharField('班主任', max_length=50)
     YEAR_CHOICES = [(r, r) for r in range(date.today().year + 1, 1984, -1)]
-    grade = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year, verbose_name='年级')
+    grade = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year, verbose_name='年级', null=True, blank=True)
     major = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
 
     def __str__(self):
@@ -203,7 +203,7 @@ class StartedCourseInfo(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.PROTECT, verbose_name='开课教师')
     course = models.ForeignKey(Course, on_delete=models.PROTECT, verbose_name='开课课程')
     YEAR_CHOICES = [(r, r) for r in range(date.today().year + 1, 1984, -1)]
-    year_start = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year, verbose_name='开课年份')
+    year_start = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year, verbose_name='开课年份', null=True, blank=True)
     SPRING = '春季'
     AUTUMN = '秋季'
     SUMMER = '夏季'
