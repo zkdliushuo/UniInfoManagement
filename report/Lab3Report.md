@@ -2,6 +2,8 @@
 
 项目地址：https://github.com/zkdliushuo/UniInfoManagement
 
+(由于服务器不稳定的原因，如果到时候打不开请老师给我说让我打开)
+
 部署好的系统入口：http://121.89.166.136:8080/index
 
 组员：刘硕 万琪 牛田 张鑾翔
@@ -336,304 +338,7 @@ def post_save_study_event(sender, instance, **kwargs):
 
 ​	选课表引用了俩个外键，一个是开课的课程号，一个是选课的学生号（学生的身份信息）。
 
-​	保存了成绩信息，设置约束为小于等于100.
-
-
-
-
-
-
-
-该部分伪代码如下：
-
-```python
-// 校区
-class Campus(models.Model):
-    id = models.CharField('校区代码', max_length=10, primary_key=True)
-    name = models.CharField('校区名称', max_length=20, null=False, unique=True)
-    address = models.CharField('校区地址', max_length=200, null=False, unique=False)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = '校区'
-        verbose_name_plural = "校区"
-
-
-class Major(models.Model):
-    id = models.CharField('专业代码', max_length=3, primary_key=True)
-    name = models.CharField('专业名称', max_length=100, null=False, unique=True)
-    address = models.CharField('专业地址', max_length=100, null=False)
-    charger = models.CharField('负责人', max_length=50, null=False)
-    campus = models.ForeignKey(Campus, verbose_name='校区', on_delete=models.PROTECT)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = '专业'
-        verbose_name_plural = "专业"
-
-
-class Classes(models.Model):
-    id = models.CharField('班级代码', max_length=9, primary_key=True)
-    name = models.CharField('班级名', max_length=50, unique=True)
-    start_date = models.DateField('创建时间', auto_now_add=True)
-    head_teacher = models.CharField('班主任', max_length=50)
-    YEAR_CHOICES = [(r, r) for r in range(date.today().year + 1, 1984, -1)]
-    grade = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year, verbose_name='年级', null=True, blank=True)
-    major = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = '班级'
-        verbose_name_plural = "班级"
-
-
-class People(models.Model):
-    def idvalidator(self):
-        if len(self) != 18:
-            raise ValueError('请输入18位身份证号码,您只输入了%s位' % len(self))
-
-    identification = models.CharField('身份信息号', primary_key=True, max_length=18, unique=True, validators=[idvalidator])
-    ID_CARD = '身份证'
-    PASSPORT = '护照'
-    ID_TYPE_CHOICES = (
-        (ID_CARD, '身份证'),
-        (PASSPORT, '护照'),
-    )
-    id_type = models.CharField('身份信息类型', max_length=7, choices=ID_TYPE_CHOICES, default=ID_CARD)
-    chinese_name = models.CharField('中文名', max_length=10, null=False)
-    MALE = '男'
-    FEMALE = '女'
-    GENDER_TYPE_CHOICES = (
-        (MALE, '男'),
-        (FEMALE, '女'),
-    )
-    gender_type = models.CharField('性别', max_length=3, choices=GENDER_TYPE_CHOICES)
-    birth_date = models.DateField('生日')
-    nationality = models.CharField('国籍', max_length=20)
-    family_addr = models.CharField('家庭住址(可选)', max_length=200, null=True, blank=True)
-    family_post_code = models.CharField('家庭邮编(可选)', max_length=6, null=True, blank=True)
-    family_phone_num = models.CharField('家庭电话(可选)', max_length=11, null=True, blank=True)
-
-    # 抽象类，用来继承，可以再考虑是不是抽象(是否需要多表)
-    class Meta:
-        abstract = True
-
-
-class Teacher(People):
-    teacher_num = models.CharField('教职工编号', max_length=10, unique=True)
-    join_date = models.DateField('入职年月')
-    email = models.EmailField('邮箱')
-    major = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
-    ASSOCIATE_PROF = '副教授'
-    PROF = '教授'
-    RANK_TYPE_CHOICES = (
-        (ASSOCIATE_PROF, '副教授'),
-        (PROF, '教授')
-    )
-    rank = models.CharField('职称', max_length=7, choices=RANK_TYPE_CHOICES)
-
-    def __str__(self):
-        return self.chinese_name
-
-    class Meta:
-        verbose_name = '教师'
-        verbose_name_plural = "教师"
-
-
-class Student(People):
-    student_id = models.CharField('学号', max_length=10, unique=True)
-    start_date = models.DateField('入学年月')
-    email = models.EmailField('邮箱')
-    classes = models.ForeignKey(Classes, on_delete=models.PROTECT, verbose_name='班级')
-
-    def __str__(self):
-        return self.chinese_name
-
-    class Meta:
-        verbose_name = '学生'
-        verbose_name_plural = "学生"
-
-
-class StudyEvent(models.Model):
-    class Meta:
-        abstract = True
-
-    event_num = models.CharField('异动编号', max_length=10, primary_key=True)
-    date = models.DateField('异动日期')
-    old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, verbose_name='原班级')
-    new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, verbose_name='新班级')
-
-    class Meta:
-        abstract = True
-        # unique_together = ('old_class', 'new_class')
-
-
-class ChangeMajor(StudyEvent):
-    CHANGE_YES = '是'
-    CHANGE_NO = '否'
-    CHANGE_NOT_MEMBER = '不是团员'
-    CHANGE_TYPE = (
-        (CHANGE_YES, '是'),
-        (CHANGE_NO, '否'),
-        (CHANGE_NOT_MEMBER, '不是团员'),
-    )
-    change_association = models.CharField('是否转出团员关系', max_length=9, choices=CHANGE_TYPE)
-    old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Change_from', verbose_name='原班级')
-    new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Change_to', verbose_name='新班级')
-    student = models.OneToOneField(Student, on_delete=models.PROTECT, verbose_name='异动学生')
-
-    def __str__(self):
-        return self.event_num + " 转专业"
-
-    class Meta:
-        verbose_name = '转专业'
-        verbose_name_plural = "转专业"
-
-
-class StudyDelay(StudyEvent):
-    DROP = '休学'
-    VOLUNTEER = '支教'
-    DELAY_REASON = (
-        (DROP, '休学'),
-        (VOLUNTEER, '支教'),
-    )
-    delay_reason = models.CharField('降级原因', max_length=5, choices=DELAY_REASON)
-    old_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Delay_from', verbose_name='原班级')
-    new_class = models.ForeignKey(Classes, on_delete=models.PROTECT, related_name='Delay_to', verbose_name='新班级')
-    student = models.OneToOneField(Student, on_delete=models.PROTECT, verbose_name='异动学生')
-
-    def __str__(self):
-        return self.event_num + " 降级"
-
-    class Meta:
-        verbose_name = '降级'
-        verbose_name_plural = "降级"
-
-
-class Course(models.Model):
-    id = models.CharField('课程号', primary_key=True, max_length=18, unique=True)
-    name = models.CharField('课程名称', unique=True, max_length=100)
-    school = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
-    EXAMS = '考试'
-    PRESENTATION = '当堂答辩'
-    TEST_TYPE = (
-        (EXAMS, '考试'),
-        (PRESENTATION, '当堂答辩'),
-    )
-    grade_info = models.CharField('考试方式', max_length=9, choices=TEST_TYPE)
-    teachers = models.ManyToManyField(
-        Teacher,
-        through='StartedCourseInfo',
-        through_fields=('course', 'teacher'),
-    )
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = '课程'
-        verbose_name_plural = "课程"
-
-
-class StartedCourseInfo(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.PROTECT, verbose_name='开课教师')
-    course = models.ForeignKey(Course, on_delete=models.PROTECT, verbose_name='开课课程')
-    YEAR_CHOICES = [(r, r) for r in range(date.today().year + 1, 1984, -1)]
-    year_start = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year, verbose_name='开课年份', null=True, blank=True)
-    SPRING = '春季'
-    AUTUMN = '秋季'
-    SUMMER = '夏季'
-    SEMESTER = (
-        (SPRING, '春季'),
-        (SUMMER, '夏季'),
-        (AUTUMN, '秋季'),
-    )
-    semester_start = models.CharField('开课学期', max_length=7, choices=SEMESTER)
-    DAY = (
-        ('Mon', '周一'),
-        ('Tus', '周二'),
-        ('Wen', '周三'),
-        ('Thu', '周四'),
-        ('Fri', '周五'),
-    )
-    day_start = models.CharField('上课日期', max_length=5, choices=DAY)
-    WHEN = (
-        ('1', '第一节'),
-        ('2', '第二节'),
-        ('3', '第三节'),
-        ('4', '第四节'),
-        ('5', '第五节'),
-        ('6', '第六节'),
-        ('7', '第七节'),
-        ('8', '第八节'),
-        ('9', '第九节'),
-    )
-    when_start = models.CharField('上课时间', max_length=7, choices=WHEN)
-
-    def __str__(self):
-        return self.course.name+" "+self.teacher.chinese_name+" "+str(self.year_start)+" "+self.semester_start
-
-    class Meta:
-        verbose_name = '开课'
-        verbose_name_plural = "开课"
-
-
-class ChooseCourse(models.Model):
-    course = models.ForeignKey(StartedCourseInfo, on_delete=models.PROTECT, verbose_name='选课课程')
-    student = models.ForeignKey(Student, on_delete=models.PROTECT, verbose_name='选课学生')
-    grade = models.PositiveSmallIntegerField('考试成绩', null=True)
-
-    def __str__(self):
-        return self.course.course.name + " " + self.student.student_id
-
-    def clean(self):
-        if self.__class__.objects.\
-                filter(student__student_id=self.student.student_id, course__course__id=self.course.course_id).\
-                exists():
-            raise ValidationError(
-                message='您已经选过这门课，不可以重复选课.',
-                code='unique_together',
-            )
-
-    class Meta:
-        verbose_name = '选课'
-        verbose_name_plural = "选课"
-
-
-# 删除异动的触发器
-@receiver(pre_delete, sender=ChangeMajor)
-@receiver(pre_delete, sender=StudyDelay)
-def post_delete_study_event(sender, instance, **kwargs):
-    if instance.student.classes.id == instance.new_class.id:
-        instance.student.classes = instance.old_class
-        instance.student.save()
-    else:
-        raise ValidationError(
-            message='该生记录不可删除',
-            code='unique_together',
-        )
-
-
-@receiver(pre_save, sender=ChangeMajor)
-@receiver(pre_save, sender=StudyDelay)
-def post_save_study_event(sender, instance, **kwargs):
-    if instance.student.classes.id == instance.old_class.id:
-        instance.student.classes = instance.new_class
-        instance.student.save()
-    else:
-        raise ValidationError(
-            message='转出班级与学生班级不匹配',
-            code='unique_together',
-        )
-
-
-```
+​	保存了成绩信息，设置约束为小于等于100。
 
 ## 系统详细设计
 
@@ -710,7 +415,222 @@ path('admin/', admin.site.urls),
 
 request：Django支持的Http报头格式，包括了报头信息，验证的Token等。
 
-参数：一般在update和delete的时候在url后面附着一个字段表示需要操作的
+参数：一般在update和delete的时候在url后面附着一个字段表示需要操作的元组的主键。这个参数被这个模块传给对应的视图函数。
+
+### 表单模块
+
+#### 模块输入
+
+​	这个模块的输入主要是从request中得到输出的表单，以及从Model中得到一个表的元组实例。如下：
+
+```
+form = forms.StudentForm(request.POST, instance=student)
+```
+
+​	在这里，StudentForm是Student表模型的子类。实例化的一个StudentForm对象的俩个初始参数为request.POST, instance=student。request.POST表示POST方法提交的表单，其会被作为这个form的data值，instance=student会被作为这个form的比较值，用来判断哪些字段被修改，以及在save和delete时验证所有字段是否合法、验证所有触发器是否被触发。
+
+#### 模块输出
+
+​	这个表单类的输出全部都是作为前端的渲染域的输入。这涉及的东西很前端和工程化，就不再详细介绍。
+
+### 视图模块
+
+views.py
+
+#### 模块输入
+
+​	视图模块是处理业务的主模块，其处理的输入包括了前端输入的表单和后端数据库的数据。
+
+#### 模块的输出
+
+​	对于POST上来的表单的save、delete等操作，模块的输出是将相应修改加到数据库里面，对于GET请求，模块的输出是返回相应的前端文件供渲染。
+
+一些特殊的功能实现我也作为模块来描述，列在下面：
+
+### 教师离职模块
+
+```python
+def delete_teacher_view(request, pk):
+    try:
+        teacher = models.Teacher.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return redirect('teacher')
+    if request.method == 'POST':
+        form = forms.StartedCourseInfoForm(request.POST)
+        if form.is_valid():
+            pass
+        ret = {}
+        for key, value in form.data.items():
+            if value:
+                ret[key] = value
+        del ret['csrfmiddlewaretoken']
+        del ret['teacher']
+        try:
+            started_course = models.StartedCourseInfo.objects.get(**ret)
+        except ObjectDoesNotExist:
+            messages.error(request, '错误：没有这个条目')
+            return redirect('teacher')
+        form = forms.StartedCourseInfoForm(request.POST, instance=started_course)
+        if form.is_valid():
+            form.save()
+            courses = models.StartedCourseInfo.objects.filter(teacher=teacher)
+            print(courses)
+            if courses.exists():
+                all_course_forms = []
+                for each in courses:
+                    all_course_forms.append(forms.TobeChangedStartedCourseInfoForm(instance=each))
+                return render(request, 'school/leave_started_course.html', context={'forms': all_course_forms})
+            else:
+                try:
+                    teacher.delete()
+                except ProtectedError:
+                    messages.error(request, '错误：存在其它关联信息，不可删除')
+                    return redirect('teacher')
+                messages.success(request, "成功删除该教师")
+                return redirect('teacher')
+    courses = models.StartedCourseInfo.objects.filter(teacher=teacher)
+    if courses.exists():
+        all_course_forms = []
+        for each in courses:
+            all_course_forms.append(forms.TobeChangedStartedCourseInfoForm(instance=each))
+        return render(request, 'school/leave_started_course.html', context={'forms': all_course_forms})
+    else:
+        try:
+            teacher.delete()
+        except ProtectedError:
+            messages.error(request, '错误：存在其它关联信息，不可删除')
+            return redirect('teacher')
+        messages.success(request, "成功删除该教师")
+        return redirect('teacher')
+```
+
+​	这部分的代码如上。
+
+#### 模块输入
+
+​	模块获取前端输入的request和pk，其中pk是代表需要离职的教师的主键，request中保存了POST上来的表单。
+
+#### 模块输出
+
+在程序中，适用pk获得待离职教师的实例：
+
+```
+teacher = models.Teacher.objects.get(pk=pk)
+```
+
+​	然后用这个实例，获得这个老师开的全部课程。
+
+```
+courses = models.StartedCourseInfo.objects.filter(teacher=teacher)
+```
+
+​	对于request的方法是GET的，表示其是刚刚点击delete教师的操作，把上面的courses返回给前端，以显示出来所有待移交的课程
+
+```
+return render(request, 'school/leave_started_course.html', context={'forms': all_course_forms})
+```
+
+​	这里的all_course_forms其实就是用courses做成的表单。
+
+​	对于request的方法是POST的，表示其是要把待移交的课程的新教师POST上来了。这时候先得到这个POST上来的表单：
+
+```
+form = forms.StartedCourseInfoForm(request.POST)
+```
+
+​	然后取出表单里面没有作用的字段以及教师字段（如果用了新教师字段，在开课数据库里将找不到任何课程），把剩余的字段做成python的字典ret，放到数据库里查询
+
+```
+started_course = models.StartedCourseInfo.objects.get(**ret)
+```
+
+​	得到了待移交的课程后，就把这个课程的教师更新成提交上来的新教师，然后再去按照pk得到实例的教师，看看现在这个老师是否还有待移交的课程。
+
+```
+courses = models.StartedCourseInfo.objects.filter(teacher=teacher)
+```
+
+​	如果没有待移交课程，删除这个教师，重定向回teacher-view视图。否则，继续之前的操作，将剩余的待开课课程转发给前端的leave-teacher视图。
+
+### 学生毕业模块
+
+#### 模块输入
+
+​	数据库中待删除学生的外键班级的所在年级信息。
+
+#### 模块输出
+
+​	按照输入的学生的年级信息，判断其和今年是否相差四年。如果相差四年及以下，就不允许删除。
+
+​	这里还有优化的空间，因为按照国内的计算方式，下半年改升级了。有机会就改掉这个小bug。但无伤大碍。
+
+### 触发器的验证模块
+
+​	学籍异动情况下的触发器设置如下：
+
+```python
+# 删除异动的触发器
+@receiver(pre_delete, sender=ChangeMajor)
+@receiver(pre_delete, sender=StudyDelay)
+def post_delete_study_event(sender, instance, **kwargs):
+    if instance.student.classes.id == instance.new_class.id:
+        instance.student.classes = instance.old_class
+        instance.student.save()
+    else:
+        raise ValidationError(
+            message='该生记录不可删除',
+            code='unique_together',
+        )
+
+
+@receiver(pre_save, sender=ChangeMajor)
+@receiver(pre_save, sender=StudyDelay)
+def post_save_study_event(sender, instance, **kwargs):
+    if instance.student.classes.id == instance.old_class.id:
+        instance.student.classes = instance.new_class
+        instance.student.save()
+    else:
+        raise ValidationError(
+            message='转出班级与学生班级不匹配',
+            code='unique_together',
+        )
+```
+
+#### 模块输入
+
+​	当前的操作的状态，主要用到的是pre_delete和pre_save，分表表示这个元组的删除前和保存前。
+
+​	另一个输入是发送者，只监听ChangeMajor和StudentDelay这俩个表。
+
+​	还有其它的输入就是来自数据库了。这里的数据一致性检查比较简单，就是想验证在删除学籍异动时，不可以有另外一个学籍异动信息改变了学生的现班级；保存学籍异动时，学籍异动信息中输入的原班级信息不可以和学生现在的班级不一致。
+
+#### 模块的输出
+
+​	异常情况下这个模块的输出时触发ValidationError。我在视图函数中的对应位置监听了这个异常，以可以在前端显示错误。
+
+​	正常情况下就是去执行相关学生的班级信息的更新。
+
+### 专业等的代码、学号、工号不可修改模块
+
+以更新班级代码为例
+
+```python
+form = forms.ClassesForm(request.POST, instance=classes)
+        if 'id' in form.changed_data:
+            form.errors.clear()
+            form.errors['id'] = '错误，班级代码不可修改'
+            return render(request, 'school/update_classes.html', context={'form': form})
+```
+
+#### 模块输入
+
+​	POST上来的表单以及待更新班级在数据库中的实例。
+
+#### 模块输出
+
+​	这里用了Django中的表单的属性changed_data，发现班级代码被修改的话，就在errors_list中加上一个报错信息，然后返回这个报错信息给当前页面。
+
+注:由于时间原因我们组没有来得及画模块的流程图。我已经尽量在上面把流程详细描述了，我们也会尽快补上这一部分。
 
 ## 系统实现与测试
 
@@ -722,53 +642,196 @@ request：Django支持的Http报头格式，包括了报头信息，验证的Tok
 
 2. 实现
 
-   （TBD）
+   测试结果
 
-3. 测试结果
+      运行场景
+      ![Image text](./assets/1-0.PNG)
+      增加过程
+      ![Image text](./assets/1-1.png)
+      增加结果
+      ![Image text](./assets/1-2.png)
+      非主键查询
+      ![Image text](./assets/1-3.png)
+      主键查询
+      ![Image text](./assets/1-4.png)
+      外键查询
+      ![Image text](./assets/1-5.png)
+      专业代码不可编辑，编辑失败
+      ![Image text](./assets/1-6.png)
+      不编辑专业代码的编辑结果
+      ![Image text](./assets/1-7.png)
+      有关联信息，不可删除的校区
+      ![Image text](./assets/1-8.png)
 
-   （TBD）
+   ### 学生管理功能
 
-### 学生管理功能
+      运行场景
+      ![Image text](./assets/4-0.PNG)
+      增加过程
+      ![Image text](./assets/4-1.png)
+      增加结果
+      ![Image text](./assets/4-2.png)
+      复合查询
+      ![Image text](./assets/4-3.png)
+      编辑过程
+      ![Image text](./assets/4-4.png)
+      编辑结果
+      ![Image text](./assets/4-5.png)
+      不可以删除非毕业学生
+      ![Image text](./assets/4-6.png)
 
-（TBD）
+   ### 教师管理功能
 
-### 教师管理功能
+      运行场景
+      ![Image text](./assets/3-0.PNG)
+      增加过程
+      ![Image text](./assets/3-1.png)
+      增加结果
+      ![Image text](./assets/3-2.png)
+      非主键内外键复合查询
+      ![Image text](./assets/3-3.png)
+      编辑过程
+      ![Image text](./assets/3-4.png)
+      编辑结果
+      ![Image text](./assets/3-5.png)
+      教师离职过程
+      ![Image text](./assets/3-6.png)
+      ![Image text](./assets/3-7.png)
+      教师离职结果
+      ![Image text](./assets/3-8.png)
 
-（TBD）
+   ### 班级管理功能
 
-### 班级管理功能
+      运行场景
+      ![Image text](./assets/2-0.PNG)
+      增加过程
+      ![Image text](./assets/2-1.png)
+      增加结果
+      ![Image text](./assets/2-2.png)
+      主键查询
+      ![Image text](./assets/2-3.png)
+      非主键内外键复合查询
+      ![Image text](./assets/2-4.png)
+      编辑过程
+      ![Image text](./assets/2-5.png)
+      编辑结果
+      ![Image text](./assets/2-6.png)
+      删除结果
+      ![Image text](./assets/2-7.png)
 
-（TBD）
+   ### 校区管理功能
 
-### 校区管理功能
+      运行场景
+      ![Image text](./assets/0-0.PNG)
+      增加过程
+      ![Image text](./assets/0-1.png)
+      增加结果
+      ![Image text](./assets/0-2.png)
+      主键查询
+      ![Image text](./assets/0-3.png)
+      其他查询
+      ![Image text](./assets/0-4.png)
+      编辑过程
+      ![Image text](./assets/0-5.png)
+      编辑结果
+      ![Image text](./assets/0-6.png)
 
-（TBD）
+   ### 学籍异动管理功能
 
-### 学籍异动管理功能
+      降级运行场景
+      ![Image text](./assets/5-0.PNG)
+      增加过程
+      ![Image text](./assets/5-1.png)
+      增加结果
+      ![Image text](./assets/5-2.png)
+      非主键查询
+      ![Image text](./assets/5-3.png)
+      编辑过程
+      ![Image text](./assets/5-4.png)
+      编辑结果
+      ![Image text](./assets/5-5.png)
+      转专业运行场景
+      ![Image text](./assets/5-6.png)
+      增加过程
+      ![Image text](./assets/5-7.png)
+      增加结果
+      ![Image text](./assets/5-8.png)
+      不可以删除被其他种类移动依赖的移动
+      ![Image text](./assets/5-9.png)
 
-（TBD）
 
-### 课程管理功能
+   ### 课程管理功能
 
-（TBD）
+      运行场景
+      ![Image text](./assets/6-1.PNG)
+      增加过程
+      ![Image text](./assets/6-2.png)
+      增加结果
+      ![Image text](./assets/6-3.png)
+      外键查询
+      ![Image text](./assets/6-4.png)
+      编辑过程
+      ![Image text](./assets/6-5.png)
+      编辑结果
+      ![Image text](./assets/6-6.png)
 
-### 教师开课管理功能
+   ### 教师开课管理功能
 
-（TBD）
+      运行场景
+      ![Image text](./assets/6-7.PNG)
+      增加过程
+      ![Image text](./assets/6-8.png)
+      增加结果
+      ![Image text](./assets/6-9.png)
+      编辑过程
+      ![Image text](./assets/6-10.png)
+      编辑结果
+      ![Image text](./assets/6-11.png)
+      试图删除因已经被选过而有关联的开课信息失败
+      ![Image text](./assets/6-12.png)
 
-### 学生选课管理功能
+   ### 学生选课管理功能
 
-（TBD）
-
-### 搜索功能
-
-（TBD）
+      运行场景
+      ![Image text](./assets/7-0.PNG)
+      增加过程
+      ![Image text](./assets/7-1.png)
+      增加结果
+      ![Image text](./assets/7-2.png)
+      编辑过程
+      ![Image text](./assets/7-3.png)
+      编辑结果
+      ![Image text](./assets/7-4.png)
+      主键之一查询
+      ![Image text](./assets/7-5.png)
 
 ## 总结与讨论
 
-（TBD）
+### 总结
+
+​	数据库的设计是信息系统的灵魂，这决定了整个程序的设计。
+
+​	一些后端架构使用了灵活的ORM映射，在这个基础上实现数据库模型的设计比较方便，并且debug以及和提供前端使用上功能很强大。
+
+​	信息管理系统中前端过于繁琐。而在Django里面提供了大量可重用的渲染字段，通过ModelForm就可以轻松地把数据库中的字段转化成前端的widget。事实上，尽管Django后端存在很多问题，但是确实节省了我们大量的开发工作。
+
+​	在小组协作中沟通交流很重要。在项目开发的前期我们组有些拖延，沟通也不多。我这个组长有一定的责任。导致现在又几个小bug和一些更好的设计来不及实现。
+
+​	在Django中实现前后端分离的协同开发时，规定好接口很重要。
+
+### 讨论
+
+​	Django的ORM对于时间的支持过于不灵活。这在很多情况下只能通过在前端和在视图中加上相应的处理才能实现时间的改变。
+
+​	教师、班主任、专业负责人的关系应该可以更加完善一下。
 
 ## 分工情况
 
-（TBD）
+刘硕：组长，负责协调沟通，负责实现数据库的设计以及视图函数的编程，负责协调沟通前后端的接口的设计，负责协调实验报告的编写，负责后期的后端的debug。
+
+万琪：负责实现前端设计，负责实现部分接口设计，负责实现部分视图函数的设计，负责后期的前端debug。
+
+牛田：主要负责实验报告的编写，负责协助开发后端数据库，负责协助开发前端设计，负责开发前后端接口设计。
+
+张鑾翔：负责程序的测试，负责找出程序的bug和设计不合理的地方，并给出建议。负责部分实验报告的编写。
 
