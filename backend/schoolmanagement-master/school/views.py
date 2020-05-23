@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import ProtectedError
 from django.contrib import messages
+from datetime import date
 
 
 def home_view(request):
@@ -165,7 +166,7 @@ def add_classes_view(request):
         if form.is_valid():
             form.save()
             # return 才能跳出当前方法 实现重定向
-            return HttpResponseRedirect('class')
+            return HttpResponseRedirect('classes')
     return render(request, 'school/add_classes.html', context={'form': form})
 
 
@@ -187,13 +188,10 @@ def teacher_view(request):
     teachers = models.Teacher.objects.all()
     if request.method == 'POST':
         form = forms.TeacherForm(request.POST)
-        print(form.data)
         ret = {}
         for key, value in form.data.items():
             if value:
-                print(key, value)
                 ret[key] = value
-
         teachers = models.Teacher.objects.filter(**ret)
     return render(request, 'school/teacher.html', context={'form': form, 'teachers': teachers})
 
@@ -202,7 +200,8 @@ def update_teacher_view(request, pk):
     try:
         teacher = models.Teacher.objects.get(pk=pk)
     except ObjectDoesNotExist:
-        print("您想编辑的条目不存在.")
+        form = forms.TeacherForm()
+        return render(request, 'school/update_teacher.html', context={'form': form})
     if request.method == 'POST':
         form = forms.TeacherForm(request.POST, instance=teacher)
         if 'teacher_num' in form.changed_data:
@@ -228,17 +227,49 @@ def add_teacher_view(request):
     return render(request, 'school/add_teacher.html', context={'form': form})
 
 
-# 建议是否改成确定删除
 def delete_teacher_view(request, pk):
     try:
         teacher = models.Teacher.objects.get(pk=pk)
     except ObjectDoesNotExist:
-        messages.error(request, '错误：不存在这个条目，不可删除')
-    try:
-        teacher.delete()
-    except ProtectedError:
-        messages.error(request, '错误：存在关联信息，不可删除')
-    return redirect('teacher')
+        return redirect('teacher')
+    if request.method == 'POST':
+        form = forms.StartedCourseInfoForm(request.POST)
+        if form.is_valid():
+            pass
+        ret = {}
+        for key, value in form.data.items():
+            if value:
+                ret[key] = value
+        del ret['csrfmiddlewaretoken']
+        del ret['teacher']
+        try:
+            started_course = models.StartedCourseInfo.objects.get(**ret)
+        except ObjectDoesNotExist:
+            messages.error(request, '错误：没有这个条目')
+            return redirect('teacher')
+        form = forms.StartedCourseInfoForm(request.POST, instance=started_course)
+        if form.is_valid():
+            form.save()
+            courses = models.StartedCourseInfo.objects.filter(teacher=teacher)
+            print(courses)
+            if courses.exists():
+                all_course_forms = []
+                for each in courses:
+                    all_course_forms.append(forms.TobeChangedStartedCourseInfoForm(instance=each))
+                return render(request, 'school/leave_started_course.html', context={'forms': all_course_forms})
+            else:
+                try:
+                    teacher.delete()
+                except ProtectedError:
+                    messages.error(request, '错误：存在其它关联信息，不可删除')
+                    return redirect('teacher')
+                messages.success(request, "成功删除该教师")
+                return redirect('teacher')
+    courses = models.StartedCourseInfo.objects.filter(teacher=teacher)
+    all_course_forms = []
+    for each in courses:
+        all_course_forms.append(forms.TobeChangedStartedCourseInfoForm(instance=each))
+    return render(request, 'school/leave_started_course.html', context={'forms': all_course_forms})
 
 
 def student_view(request):
@@ -291,10 +322,15 @@ def delete_student_view(request, pk):
         student = models.Student.objects.get(pk=pk)
     except ObjectDoesNotExist:
         messages.error(request, '错误：不存在这个条目，不可删除')
-    try:
-        student.delete()
-    except ProtectedError:
-        messages.error(request, '错误：存在关联信息，不可删除')
+    print(type(student.classes.grade))
+    print(type(date.today().year))
+    if student.classes.grade + 4 < date.today().year:
+        try:
+            student.delete()
+        except ProtectedError:
+            messages.error(request, '错误：存在关联信息，不可删除')
+    else:
+        messages.error(request, '错误：该生还没有毕业，不可删除')
     return redirect('student')
 
 

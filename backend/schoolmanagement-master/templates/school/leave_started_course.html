@@ -1,0 +1,76 @@
+{% extends 'school/base.html' %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+
+<head>
+
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="https://use.fontawesome.com/4498ac6aa5.js"></script>
+
+  <style media="screen">
+    .row {
+      margin: 10px;
+    }
+
+    .table {
+      text-align: center;
+    }
+    .badge {
+      width: 35px;
+      height: 20px;
+      font-size: 14px;
+    }
+
+  </style>
+
+</head>
+
+
+
+<div class="container">
+  <div class="row">
+    <a class="btn btn-primary" href="/teacher" role="button">取消</a>
+    <table class="table table-hover table-striped table-bordered" id="dev-table">
+      <thead class="thead-dark">
+        <tr>
+          <th>开课老师</th>
+          <th>课程</th>
+          <th>开课年份</th>
+          <th>开课学期</th>
+          <th>上课日期</th>
+          <th>上课时间</th>
+          <th>移交</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for form in forms %}
+          <tr><form method="post" novalidate>
+              {% csrf_token %}
+              {% for field in form %}
+                  <div class="form-group col-md-4">
+                      <label for="field.id_for_label">{{ field.label }}</label>
+                      {% if field.errors %}
+                          <td>{% render_field field class="form-control is-invalid" id="field.id_for_label" %}</td>
+                          <div class="invalid-feedback">
+                            {{ field.errors }}
+                          </div>
+                      {% else %}
+                          <td>{% render_field field class="form-control" id="field.id_for_label" %}</td>
+                      {% endif %}
+                  </div>
+              {% endfor %}
+              <div style="text-align:right;">
+                  <td><button type="submit" class="btn btn-primary">移交</button></td>
+              </div>
+          </form> </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+  </div>
+</div>
+
+{% endblock content %}

@@ -39,7 +39,8 @@ class Classes(models.Model):
     name = models.CharField('班级名', max_length=50, unique=True)
     start_date = models.DateField('创建时间', auto_now_add=True)
     head_teacher = models.CharField('班主任', max_length=50)
-    grade = models.CharField('年级', max_length=4)
+    YEAR_CHOICES = [(r, r) for r in range(date.today().year + 1, 1984, -1)]
+    grade = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year, verbose_name='年级')
     major = models.ForeignKey(Major, on_delete=models.PROTECT, verbose_name='专业')
 
     def __str__(self):
@@ -201,7 +202,8 @@ class Course(models.Model):
 class StartedCourseInfo(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.PROTECT, verbose_name='开课教师')
     course = models.ForeignKey(Course, on_delete=models.PROTECT, verbose_name='开课课程')
-    year_start = models.DateField('开课年份')
+    YEAR_CHOICES = [(r, r) for r in range(date.today().year + 1, 1984, -1)]
+    year_start = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year, verbose_name='开课年份')
     SPRING = '春季'
     AUTUMN = '秋季'
     SUMMER = '夏季'
@@ -233,7 +235,7 @@ class StartedCourseInfo(models.Model):
     when_start = models.CharField('上课时间', max_length=7, choices=WHEN)
 
     def __str__(self):
-        return self.course.name+" "+self.teacher.chinese_name+" "+str(self.year_start.year)+" "+self.semester_start
+        return self.course.name+" "+self.teacher.chinese_name+" "+str(self.year_start)+" "+self.semester_start
 
     class Meta:
         verbose_name = '开课'

@@ -29,6 +29,7 @@ urlpatterns = [
     path('delete-classes/<pk>', views.delete_classes_view, name='delete-classes'),
 
     path('teacher', views.teacher_view, name='teacher'),
+    # path('leave-teacher/<pk>', views.teacher_view, name='teacher'),
     path('update-teacher/<pk>', views.update_teacher_view, name='update-teacher'),
     path('add-teacher', views.add_teacher_view, name='add-teacher'),
     path('delete-teacher/<pk>', views.delete_teacher_view, name='delete-teacher'),

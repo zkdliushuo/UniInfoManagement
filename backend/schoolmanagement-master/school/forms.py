@@ -68,6 +68,20 @@ class StartedCourseInfoForm(forms.ModelForm):
         fields = '__all__'
 
 
+class TobeChangedStartedCourseInfoForm(forms.ModelForm):
+    class Meta:
+        model = models.StartedCourseInfo
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        self.fields['year_start'].widget.attrs['readonly'] = True
+        self.fields['semester_start'].widget.attrs['readonly'] = True
+        self.fields['day_start'].widget.attrs['readonly'] = True
+        self.fields['when_start'].widget.attrs['readonly'] = True
+        self.fields['course'].widget.attrs['readonly'] = True
+
+
 class ChooseCourseForm(forms.ModelForm):
     class Meta:
         model = models.ChooseCourse
