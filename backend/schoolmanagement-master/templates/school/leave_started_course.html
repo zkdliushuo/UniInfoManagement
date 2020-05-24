@@ -64,7 +64,7 @@
                         {% endif %}
                     </div>
                   {% else %}
-                    <td>{{ field.value }}</td>
+                    <td>{% render_field field class="form-control" id="field.id_for_label" disabled="disabled" %}</td>
                   {% endif %}
               {% endfor %}
               <div style="text-align:right;">
