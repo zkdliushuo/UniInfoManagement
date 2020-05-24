@@ -14,6 +14,10 @@
       margin: 10px;
     }
 
+    .cancel {
+      text-align: right;
+    }
+
     .table {
       text-align: center;
     }
@@ -31,7 +35,6 @@
 
 <div class="container">
   <div class="row">
-    <a class="btn btn-primary" href="/teacher" role="button">取消</a>
     <table class="table table-hover table-striped table-bordered" id="dev-table">
       <thead class="thead-dark">
         <tr>
@@ -49,17 +52,20 @@
           <tr><form method="post" novalidate>
               {% csrf_token %}
               {% for field in form %}
-                  <div class="form-group col-md-4">
-                      <label for="field.id_for_label">{{ field.label }}</label>
-                      {% if field.errors %}
-                          <td>{% render_field field class="form-control is-invalid" id="field.id_for_label" %}</td>
-                          <div class="invalid-feedback">
-                            {{ field.errors }}
-                          </div>
-                      {% else %}
-                          <td>{% render_field field class="form-control" id="field.id_for_label" %}</td>
-                      {% endif %}
-                  </div>
+                  {% if field.label == "开课教师" %}
+                    <div class="form-group col-md-4">
+                        {% if field.errors %}
+                            <td>{% render_field field class="form-control is-invalid" id="field.id_for_label" %}</td>
+                            <div class="invalid-feedback">
+                              {{ field.errors }}
+                            </div>
+                        {% else %}
+                            <td>{% render_field field class="form-control" id="field.id_for_label" %}</td>
+                        {% endif %}
+                    </div>
+                  {% else %}
+                    <td>{{ field.value }}</td>
+                  {% endif %}
               {% endfor %}
               <div style="text-align:right;">
                   <td><button type="submit" class="btn btn-primary">移交</button></td>
@@ -68,8 +74,9 @@
         {% endfor %}
       </tbody>
     </table>
-
-
+  </div>
+  <div class="row" style="float: right">
+    <a class="btn btn-primary" href="/teacher" role="button">取消</a>
   </div>
 </div>
 

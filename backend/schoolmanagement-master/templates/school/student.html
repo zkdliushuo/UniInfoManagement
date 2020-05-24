@@ -34,7 +34,7 @@
     <form method="post" novalidate>
       <div class="form-row">
         {% for field in form %}
-          <div class="form-group col-md-2">
+          <div class="form-group col-md-2" style="z-index: -1">
             {% render_field field class="form-control" class="is-valid" placeholder=field.label %}
           </div>
         {% endfor %}
